@@ -1,0 +1,295 @@
+---
+title: "Week_12_IP"
+author: "Melissa Kanyi"
+date: "3/2/2020"
+output: pdf_document
+---
+
+# 1.1 Introduction
+## 1.1.1 Defining the Question
+Create a prediction model that most accurately predicts whether a user will click an Ad.
+
+## 1.1.2 The Context
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog.
+She currently targets audiences originating from various countries.
+In the past, she ran ads to advertise a related course on the same blog and collected data in the process.
+She would now like to employ your services as a Data Science Consultant to create a solution that would allow her to determine whether ads targeted to audiences of certain characteristics i.e. city, male country, ad topic, etc. would click on her ads.
+
+## 1.1.3 Metrics of Success
+Accuracy Score of 85% or above
+
+## 1.1.4 Experimental Design Taken
+Installing packages and loading libraries needed
+Loading the data
+Exploratory Data Analysis
+Data Cleaning
+Visualizations
+
+## 1.1.5 Appropriateness of the Data
+The columns in the dataset include:
+  - Daily Time Spent on Site
+  - Age
+  - Area Income
+  - Daily Internet Usage
+  - Ad Topic Line
+  - City
+  - Male
+  - Country
+  - Timestamp
+  - Clicked on Ad
+
+# 1.2 Installing & Loading necessary packages
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library(data.table)
+```
+
+```{r}
+library(dplyr)
+```
+
+
+# 1.3 Loading the Data
+```{r}
+library(readr)
+```
+
+```{r}
+advertising <- read_csv("Downloads/advertising.csv")
+```
+
+```{r}
+advertising
+```
+
+```{r}
+ads <- advertising
+head(ads)
+```
+
+# 1.4 Checking the Data
+```{r}
+# Viewing the top of the data
+head(ads)
+```
+
+
+```{r}
+# viewing the bottom of the data
+tail(ads)
+```
+
+
+```{r}
+# checking the number of rows and columns
+dim(ads)
+```
+There are 1000 rows and 10 columns.
+
+```{r}
+# checking the types of attributes
+sapply(ads, class)
+```
+
+```{r}
+# checking the summary statistics of the data
+summary(ads)
+```
+
+```{r}
+# summary information of the dataset
+glimpse(ads)
+```
+
+# 1.5 Data Cleaning
+## Missing Values
+```{r}
+# Checking for missing values by columns 
+colSums(is.na(ads))
+```
+There are no missing values in the dataset from the output above
+
+## Duplicates
+```{r}
+# checking for duplicated rows
+dr <- unique(ads)
+dr
+```
+There are no duplicated rows on our dataset
+
+## Fixing spaces in the column names
+```{r}
+# checking the column names
+names(ads)
+```
+
+```{r}
+# Replacing spaces in the column names with an underscore
+names(ads) <- gsub(" ", "_", names(ads))
+```
+
+
+```{r}
+# confirming the column names have changed
+names(ads)
+```
+
+## Outliers
+```{r}
+# Using boxplot to check for observations far away from other points
+# Using all the three double type columns: while specifying each
+Daily_Time_Spent_on_Site <- ads$Daily_Time_Spent_on_Site
+Age <- ads$Age
+Daily_Internet_Usage <- ads$Daily_Internet_Usage
+
+boxplot(Daily_Time_Spent_on_Site,Age,Daily_Internet_Usage,
+        main = "Multiple boxplots for comparison",
+        at = c(1,2,3),
+        names = c("Daily time spent on site","Age","Daily Internet Usage"),
+        col = c("red","blue","orange"),
+        border = "black",
+        horizontal = TRUE,
+        notch = TRUE
+        )
+```
+There are no outliers in the three features plotted
+
+```{r}
+# Boxplot for the Area Income
+# labeling the title
+# labeling the x axis
+# Specifying color options
+
+boxplot(ads$Area_Income,
+        main = "Area Income Boxplot",
+        xlab = "Area Income",
+        col = "orange",
+        border = "blue",
+        horizontal = TRUE,
+        notch = TRUE
+        )
+```
+There are a few outliers on the first quartile of the Area income boxplot.
+
+# 1.6 Visualizations
+## Univariate Analysis
+```{r}
+# getting the age range on the target group
+age_range <- range(ads$Age)
+age_range
+```
+- The age ranges from 19-61
+
+```{r}
+# getting the range of the area income
+income_range <- range(ads$Area_Income)
+income_range
+```
+- The area income ranges from 13996-79484
+
+```{r}
+hist(ads$Daily_Time_Spent_on_Site)
+```
+- Histogram is skewed to the left showing that most people spent their 65-85 of their time on the site .
+
+```{r}
+hist(ads$Age)
+```
+
+```{r}
+hist(ads$Daily_Internet_Usage)
+```
+
+```{r}
+hist(ads$Area_Income)
+```
+- Most of the people earned between 5,000 and 7,000 
+
+```{r}
+hist(ads$Male)
+```
+- There are more females than males.
+
+## Bivariate Analysis Visualizations
+```{r}
+plot(ads$Daily_Time_Spent_on_Site, ads$Age,
+     col = "#cc0000", 
+     pch = 19,
+     main = "Daily time spent on site vs Age",
+     xlab = "Daily Time Spent on Site",
+     ylab = "Age"
+     )
+```
+- This slightly shows that people below the age of 40 spend more time on the site.
+
+```{r}
+plot(ads$Area_Income, ads$Age,
+     col = "#cc0000", 
+     pch = 19,
+     main = "Income vs Age",
+     xlab = "Area Income",
+     ylab = "Age"
+     )
+```
+- This just shows that regardless of age, most of the people earn more than 50000.
+
+```{r}
+plot(ads$Daily_Time_Spent_on_Site, ads$Area_Income,
+     col = "#cc0000", 
+     pch = 19,
+     main = "Daily time spent on site vs Income",
+     xlab = "Daily Time Spent on Site",
+     ylab = "Daily Income"
+)
+```
+
+```{r}
+# stacked bar chart
+# giving a title to the chart
+# labeling the x and y axis
+# Setting the color options
+# Creating a legend for easier reference
+
+count <- table(ads$Clicked_on_Ad, ads$Male)
+barplot(count,
+        main = "A Stacked bar chart showing Clicked on Ad by Gender",
+        xlab = "Gender",
+        ylab = "Frequency",
+        col = c("pink","cyan"),
+        legend = rownames(count)
+        )
+```
+- There are slightly more females than males in the dataset.
+- More females clicked on Ad compared to males.
+
+```{r}
+count <- table(ads$Clicked_on_Ad)
+barplot(count,
+        main = "A bar chart showing Clicked on Ad distribution",
+        xlab = "CLicked on Ad or not",
+        ylab = "Frequency",
+        col = c("red","purple"),
+        legend = rownames(count))
+```
+- The data is balanced since the number of people who clicked on Ad were equal to those who did not.
+
+```{r}
+#installing the necessary packages and the libraries.
+install.packages("corrplot")
+library(corrplot)
+
+#`getting the numeric values of our dataaset
+num_data = ads[, sapply(ads, is.numeric)]
+
+#plotting the numeric values.
+corrplot(cor(num_data), method = 'shade')
+```
+- We can see that the daily time spent on the site and the daily internet usage have a slightly high correlation.
+- Whether you're male or not has no correlation with all the other varirables.
+
+```{r}
+cor(num_data, use = "complete.obs", method = "pearson")
+```
