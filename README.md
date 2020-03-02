@@ -47,4 +47,4 @@ R Programming
 
 *{MIT License.  See below for more details on licensing.}*
 
-Copyright (c) {2019} **{Moringa School Data Science Core 2}**
+Copyright (c) {2020} **{Moringa School Data Science Core 2}**
